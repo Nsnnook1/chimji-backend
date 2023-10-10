@@ -70,3 +70,7 @@ exports.login = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.CheckAuth = (req, res, next) => {
+  res.status(200).json({ user: req.user });
+};
