@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  user
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String    @unique
+  mobile    String    @unique
+  password  String
+  role      Role      @default(user)
+  Orders    Orders[]
+  Address   Address[]
+}
+
+model Address {
+  id           Int        @id @default(autoincrement())
+  address_name String
+  street       String
+  district     String
+  subDistrict  String
+  province     String
+  postCode     Int
+  Delivery     Delivery[]
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+}
+
+model Delivery {
+  id              Int      @id @default(autoincrement())
+  delivery_date   DateTime @default(now())
+  delivery_mobile Int
+  delivery_price  Int
+  delivery_type   String
+  recipient       String
+  address         Address  @relation(fields: [addressId], references: [id])
+  addressId       Int
+  Orders          Orders[]
+}
+
+enum Status {
+  success
+  pending
+}
+
+model Orders {
+  id           Int            @id @default(autoincrement())
+  order_date   DateTime       @default(now())
+  payment      String
+  status       Status         @default(pending)
+  total_price  Int
+  OrderDetails OrderDetails[]
+  user        User          @relation(fields: [userId], references: [id])
+  userId       Int
+  delivery     Delivery       @relation(fields: [deliveryId], references: [id])
+  deliveryId   Int
+}
+
+model OrderDetails {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  orders     Orders   @relation(fields: [ordersId], references: [id])
+  ordersId   Int
+  product    Products @relation(fields: [productsId], references: [id])
+  productsId Int
+}
+
+model Products {
+  id              Int            @id @default(autoincrement())
+  product_name    String
+  product_price   Int
+  product_picture String
+  OrderDetails    OrderDetails[]
+}
