@@ -27,14 +27,13 @@ model User {
 model Address {
   id           Int        @id @default(autoincrement())
   address_name String
-  street       String
   district     String
   subDistrict  String
   province     String
   postCode     Int
   Delivery     Delivery[]
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
 }
 
 model Delivery {
@@ -61,25 +60,36 @@ model Orders {
   status       Status         @default(pending)
   total_price  Int
   OrderDetails OrderDetails[]
-  user        User          @relation(fields: [userId], references: [id])
+  user         User           @relation(fields: [userId], references: [id])
   userId       Int
   delivery     Delivery       @relation(fields: [deliveryId], references: [id])
   deliveryId   Int
 }
 
 model OrderDetails {
-  id         Int      @id @default(autoincrement())
-  quantity   Int
-  orders     Orders   @relation(fields: [ordersId], references: [id])
-  ordersId   Int
-  product    Products @relation(fields: [productsId], references: [id])
-  productsId Int
+  id       Int    @id @default(autoincrement())
+  quantity Int
+  orders   Orders @relation(fields: [ordersId], references: [id])
+  ordersId Int
+  menus    Menus  @relation(fields: [menusId], references: [id])
+  menusId  Int
 }
 
-model Products {
-  id              Int            @id @default(autoincrement())
-  product_name    String
-  product_price   Int
-  product_picture String
-  OrderDetails    OrderDetails[]
+model Cart {
+  id       Int    @id @default(autoincrement())
+  name     String
+  price    Int
+  quantity Int
+  menuId   Menus  @relation(fields: [menusId], references: [id])
+  menusId  Int
+}
+
+model Menus {
+  id           Int            @id @default(autoincrement())
+  name         String
+  price        Int
+  detail       String
+  picture      String
+  OrderDetails OrderDetails[]
+  Cart         Cart[]
 }

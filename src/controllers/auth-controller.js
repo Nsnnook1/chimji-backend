@@ -3,19 +3,36 @@ const jwt = require("jsonwebtoken");
 
 const { registerSchema, loginSchema } = require("../validators/auth-validator");
 const prisma = require("../models/prisma");
+const createErr = require("../utils/create-error");
 
 exports.register = async (req, res, next) => {
   try {
-    console.log(req.body);
     const { value, err } = registerSchema.validate(req.body);
     if (err) {
       return next(err);
     }
-    console.log(value);
 
     value.password = await bcrypt.hash(value.password, 12);
+    const data = {
+      firstname: value.firstname,
+      lastname: value.lastname,
+      email: value.email,
+      mobile: value.mobile,
+      password: value.password,
+      role: value.role,
+      Address: {
+        create: {
+          address_name: value.address_name,
+          district: value.district,
+          subDistrict: value.subDistrict,
+          province: value.province,
+          postCode: Number(value.postCode),
+        },
+      },
+    };
+
     const user = await prisma.user.create({
-      data: value,
+      data,
     });
     const payload = { userId: user.id };
     const accessToken = jwt.sign(
@@ -27,14 +44,12 @@ exports.register = async (req, res, next) => {
     );
     delete user.password;
     delete user.role;
-
     res.status(201).json({ accessToken, user });
-    console.log(value);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
-
 
 exports.login = async (req, res, next) => {
   try {
@@ -43,9 +58,7 @@ exports.login = async (req, res, next) => {
       return next(err);
     }
     const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: value.email }, { mobile: value.mobile }],
-      },
+      where: { email: value.email },
     });
     if (!user) {
       return next(createErr("invalid credential"), 400);
@@ -71,6 +84,6 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.CheckAuth = (req, res, next) => {
+exports.CheckAuthUser = (req, res, next) => {
   res.status(200).json({ user: req.user });
 };
