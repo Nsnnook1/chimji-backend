@@ -6,6 +6,6 @@ router.post("/add", adminController.addMenu);
 router.get("/menu", adminController.getAllMenu);
 router.get("/orders", adminController.adminCheckOrders);
 router.put("/editMenu", adminController.editMenu);
-router.delete("/delete", adminController.deleteMenu);
+router.delete("/deleteMenu", adminController.deleteMenu);
 
 module.exports = router;
