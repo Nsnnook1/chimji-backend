@@ -9,7 +9,7 @@ exports.addToCart = async (req, res, next) => {
         name: value.name,
         price: +value.price,
         quantity: +value.quantity,
-        menusId: +value.menusId,
+        menuId: +value.menuId,
       },
     });
     res.status(200).json({ msg: "Add Success", cart });

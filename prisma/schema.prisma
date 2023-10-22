@@ -60,7 +60,7 @@ model Orders {
   status       Status         @default(pending)
   total_price  Int
   OrderDetails OrderDetails[]
-  user         User           @relation(fields: [userId], references: [id])
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
   delivery     Delivery       @relation(fields: [deliveryId], references: [id])
   deliveryId   Int
@@ -71,8 +71,8 @@ model OrderDetails {
   quantity Int
   orders   Orders @relation(fields: [ordersId], references: [id])
   ordersId Int
-  menus    Menus  @relation(fields: [menusId], references: [id])
-  menusId  Int
+  menu     Menu   @relation(fields: [menuId], references: [id])
+  menuId   Int
 }
 
 model Cart {
@@ -80,11 +80,11 @@ model Cart {
   name     String
   price    Int
   quantity Int
-  menuId   Menus  @relation(fields: [menusId], references: [id])
-  menusId  Int
+  Menu     Menu?  @relation(fields: [menuId], references: [id])
+  menuId   Int?
 }
 
-model Menus {
+model Menu {
   id           Int            @id @default(autoincrement())
   name         String
   price        Int
