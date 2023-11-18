@@ -1,9 +1,9 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 const { registerSchema, loginSchema } = require("../validators/auth-validator");
 const prisma = require("../models/prisma");
 const createErr = require("../utils/create-error");
+const { creatToken } = require("../utils/jwt");
 
 exports.register = async (req, res, next) => {
   try {
@@ -35,13 +35,8 @@ exports.register = async (req, res, next) => {
       data,
     });
     const payload = { userId: user.id };
-    const accessToken = jwt.sign(
-      payload,
-      process.env.JWT_SECRET_KEY || "lkjhgfdsamnbvcxzpoiuytrewq",
-      {
-        expiresIn: process.env.JWT_EXP,
-      }
-    );
+    //! fn createToken
+    const accessToken = creatToken(payload);
     delete user.password;
     delete user.role;
     res.status(201).json({ accessToken, user });
@@ -61,22 +56,16 @@ exports.login = async (req, res, next) => {
       where: { email: value.email },
     });
     if (!user) {
-      return next(createErr("invalid credential"), 400);
+      return next(createErr("invalid credential"), 400); //ใส่ค่าเหมือนกัน เพื่อให้คนอ่านไม่รู้ว่า error ที่ตรงไหน
     }
 
     const isMatch = await bcrypt.compare(value.password, user.password);
     if (!isMatch) {
-      return next(createErr("invalid credential"), 400); //ใส่ค่าเหมือนกัน เพื่อให้คนอ่นไม่รู้ว่า err ที่ตรงไหน
+      return next(createErr("invalid credential"), 400); //ใส่ค่าเหมือนกัน เพื่อให้คนอ่านไม่รู้ว่า error ที่ตรงไหน
     }
 
     const payload = { userId: user.id };
-    const accessToken = jwt.sign(
-      payload,
-      process.env.JWT_SECRET_KEY || "lkjhgfdsamnbvcxzpoiuytrewq",
-      {
-        expiresIn: process.env.JWT_EXP,
-      }
-    );
+    const accessToken = creatToken(payload);
     delete user.password;
     res.status(200).json({ accessToken, user });
   } catch (err) {

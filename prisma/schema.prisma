@@ -80,7 +80,7 @@ model Cart {
   id       Int    @id @default(autoincrement())
   name     String
   price    Int
-  quantity Int?
+  quantity Int?   @default(1)
   menu     Menu   @relation(fields: [menuId], references: [id])
   menuId   Int
   user     User   @relation(fields: [userId], references: [id])
