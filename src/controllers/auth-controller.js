@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 
 const { registerSchema, loginSchema } = require("../validators/auth-validator");
 const prisma = require("../models/prisma");
-const createErr = require("../utils/create-error");
 const { creatToken } = require("../utils/jwt");
+const createErr = require("../utils/create-error");
 
 exports.register = async (req, res, next) => {
   try {
@@ -55,6 +55,7 @@ exports.login = async (req, res, next) => {
     const user = await prisma.user.findFirst({
       where: { email: value.email },
     });
+
     if (!user) {
       return next(createErr("invalid credential"), 400); //ใส่ค่าเหมือนกัน เพื่อให้คนอ่านไม่รู้ว่า error ที่ตรงไหน
     }

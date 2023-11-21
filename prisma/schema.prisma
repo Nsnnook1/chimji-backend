@@ -17,7 +17,7 @@ model User {
   firstname String
   lastname  String
   email     String    @unique
-  mobile    String    @unique
+  mobile    String?
   password  String
   role      Role      @default(user)
   Orders    Orders[]
@@ -46,7 +46,6 @@ model Delivery {
   recipient       String
   address         Address  @relation(fields: [addressId], references: [id])
   addressId       Int
-  Orders          Orders[]
 }
 
 enum Status {
@@ -63,8 +62,6 @@ model Orders {
   OrderDetails OrderDetails[]
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
-  delivery     Delivery       @relation(fields: [deliveryId], references: [id])
-  deliveryId   Int
 }
 
 model OrderDetails {

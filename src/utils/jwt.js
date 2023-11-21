@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-
 exports.creatToken = (payload) => {
   return jwt.sign(
     payload,

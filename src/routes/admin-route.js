@@ -8,6 +8,7 @@ router.post(
   uploadMiddleware.single("picture"),
   adminController.addMenu
 );
+router.get("/getOrdersDetail", adminController.getOrdersDetail);
 router.get("/menu", adminController.getAllMenu);
 router.get("/orders", adminController.adminCheckOrders);
 router.put(

@@ -1,18 +1,19 @@
-const prisma = require("../models/prisma");
 const { upload } = require("../utils/cloudinary-service");
+const prisma = require("../models/prisma");
 
 exports.addMenu = async (req, res, next) => {
   try {
     const value = req.body;
+    let path = null;
     if (req.file) {
-      value.picture = await upload(req.file.path);
+      path = await upload(req.file.path);
     }
-    const menu = await prisma.menu.create({
+    await prisma.menu.create({
       data: {
         name: value.name,
         detail: value.detail,
         price: +value.price,
-        picture: value.picture,
+        picture: path || "",
       },
     });
     res.status(200).json({ msg: "Add menu successfully!!" });
@@ -34,9 +35,7 @@ exports.getAllMenu = async (req, res, next) => {
 exports.editMenu = async (req, res, next) => {
   try {
     const id = req.params.id;
-    console.log(req.params.id);
     const value = req.body;
-    console.log(value.id);
 
     if (req.file) {
       value.picture = await upload(req.file.path);
@@ -62,33 +61,11 @@ exports.editMenu = async (req, res, next) => {
 exports.deleteMenu = async (req, res, next) => {
   try {
     const value = req.params;
-    console.log(value);
-
-    const carts = await prisma.cart.findMany({
+    await prisma.menu.delete({
       where: {
-        menuId: value.id,
+        id: +value.id,
       },
     });
-
-    if (carts.length > 0) {
-      const deleteCartByMenuId = await prisma.cart.delete({
-        where: {
-          menuId: value.id,
-        }
-      })
-
-      const deleteMenu = await prisma.menu.delete({
-        where: {
-          id: +value.id,
-        },
-      });
-    } else {
-      const deleteMenu = await prisma.menu.delete({
-        where: {
-          id: +value.id,
-        },
-      });
-    }
 
     res.status(200).json({ msg: "Delete Success" });
   } catch (err) {
@@ -101,6 +78,20 @@ exports.adminCheckOrders = async (req, res, next) => {
   try {
     const checkUserOrders = await prisma.orderDetails.findMany();
     res.status(200).json({ msg: "Found orders successfully", checkUserOrders });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getOrdersDetail = async (req, res, next) => {
+  try {
+    const orderDetails = await prisma.orderDetails.findMany({
+      include: {
+        menu: true,
+        orders: true,
+      },
+    });
+    res.status(200).json({ msg: "Found orders successfully", orderDetails });
   } catch (err) {
     next(err);
   }
