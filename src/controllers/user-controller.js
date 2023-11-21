@@ -32,14 +32,14 @@ exports.createOrders = async (req, res, next) => {
       data: {
         userId: +req.user.id,
         payment: path,
-        total_price: 200,
+        total_price: +req.body.totalPrice,
       },
     });
 
     const data = cart.map((x) => {
       return { ordersId: orders.id, quantity: x.quantity, menuId: x.menu.id };
     });
-    
+
     await prisma.orderDetails.createMany({
       data: data,
     });
