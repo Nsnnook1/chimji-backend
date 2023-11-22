@@ -36,6 +36,7 @@ exports.editMenu = async (req, res, next) => {
   try {
     const id = req.params.id;
     const value = req.body;
+    console.log(value, "value");
 
     if (req.file) {
       value.picture = await upload(req.file.path);
